@@ -1,15 +1,15 @@
+// client
+// faraz
+
 #include <arpa/inet.h>
 #include <ctype.h>
+#include <epoll.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/epoll.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #define MAXEVENTS  4
@@ -60,7 +60,7 @@ void readline(int sockfd, char *buf, int size)
     buf[pos] = '\0';
 }
 
-int main(int argc, char* const argv[])
+int main(int argc, char const *argv[])
 {
     char *server = NULL;
     char *filename = NULL;
@@ -77,7 +77,7 @@ int main(int argc, char* const argv[])
     }
     
     char  c;
-    while((c = getopt(argc, argv, "s:f:p:o:r:t:")) != -1)
+    while((c = getopt (argc, argv, "s:f:p:o:r:t:")) != -1)
     {
         switch(c)
         {
@@ -168,12 +168,8 @@ int main(int argc, char* const argv[])
     readline(sockfd, buf, BUFFERSIZE);
     printf("Received: %s", buf);
     
-    int filefd = open(outfile == NULL ? filename : outfile, O_WRONLY);
-    if(filefd == -1)
-    {
-        perror("open");
-        return 6;
-    }
+    FILE * fp;
+    fp = fopen(outfile == NULL ? filename : outfile, "w");
     
     struct epoll_event events[MAXEVENTS];
     for(;;)
@@ -193,11 +189,6 @@ int main(int argc, char* const argv[])
                 else
                 {
                     size_t rbytes = recv(sockfd, buf, BUFFERSIZE, 0);
-                    if(rbytes < 1)
-                    {
-                        fprintf(stderr, "rbytes < 1 \n");
-                        continue;
-                    }
                     size_t wbytes = fwrite(buf, rbytes, 1, fp);
                     if(rbytes != wbytes) fprintf(stderr, "rbytes != wbytes \n");
                 }
