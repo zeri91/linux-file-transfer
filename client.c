@@ -1,6 +1,3 @@
-// client
-// faraz
-
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <epoll.h>
